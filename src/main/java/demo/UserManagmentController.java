@@ -1,7 +1,7 @@
 package demo;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,9 +18,15 @@ public class UserManagmentController {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserBoundary store(@RequestBody UserBoundary user)
+    public UserBoundary store(@Valid @RequestBody UserBoundary user, BindingResult result)
     {
-        return this.userManagementService.store(user);
+		if (result.hasErrors()) {
+	        System.err.println("Validation Failed");
+	        return null;
+	    }
+
+		return this.userManagementService.store(user);
+
     }
 
     @RequestMapping(path = "/users/{email}",
