@@ -1,8 +1,11 @@
 package demo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 public class UserManagmentController {
@@ -32,7 +35,7 @@ public class UserManagmentController {
     @RequestMapping(path = "/users/{email}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public SecuredUserBoundary get(@PathVariable("email") String email)
+    public UserBoundary get(@PathVariable("email") String email)
     {
         return this.userManagementService.get(email);
     }
@@ -40,7 +43,7 @@ public class UserManagmentController {
     @RequestMapping(path = "/users/login/{email}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public SecuredUserBoundary login(@PathVariable("email") String email,
+    public UserBoundary login(@PathVariable("email") String email,
                                      @RequestParam(name="password", required = true)  String password)
     {
         return this.userManagementService.login(email, password);
@@ -66,7 +69,7 @@ public class UserManagmentController {
     @RequestMapping(path = "/users/search",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public SecuredUserBoundary[] search(
+    public UserBoundary[] search(
             @RequestParam(name="criteriaType", required = false, defaultValue = "")  String criteriaType,
             @RequestParam(name="criteriaValue", required = false, defaultValue = "")  String value,
             @RequestParam(name="size", required = false, defaultValue = "10")  String size,

@@ -70,8 +70,18 @@ public class KeyValueStoreBasedUserManagementService implements UserManagmentSer
 	}
 
 	@Override
+	public void updateUser(String email, UserBoundary user) {
+
+	}
+
+	@Override
 	public void deleteAll() {
 		this.restTemplate.delete(this.url);
+	}
+
+	@Override
+	public UserBoundary[] search(String criteriaType, String value, String size, String page, String sortBy, String sortOrder) {
+		return new UserBoundary[0];
 	}
 
 }
