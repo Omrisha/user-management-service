@@ -1,14 +1,23 @@
 package demo;
 
+import javax.validation.constraints.Email;
+
+import org.springframework.lang.NonNull;
+
 public class UserBoundary {
+	@NonNull
+	@Email(message = "Email must be valid")
     private String email;
+	@NonNull
     private NameBoundary name;
+	@ValidPassword
     private String password;
+	@NonNull
     private String birthdate;
+	@NonNull
     private String[] roles;
 
-    public UserBoundary() {
-    }
+    public UserBoundary() {}
 
     public UserBoundary(String email, NameBoundary name, String password, String birthdate, String[] roles) {
         this.email = email;

@@ -1,9 +1,12 @@
 package demo;
 
 public interface UserManagmentService {
-    UserBoundary store(UserBoundary user);
+    
+	public UserBoundary store(UserBoundary user);
 
-    UserBoundary get(String email);
+	public UserBoundary get(String email);
 
-    UserBoundary login(String email, String password);
+	public UserBoundary login(String email, String password);
+
+	public void deleteAll();
 }
