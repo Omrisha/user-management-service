@@ -1,5 +1,6 @@
 package demo;
 
+import demo.layout.UserBoundary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
