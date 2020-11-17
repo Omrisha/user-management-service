@@ -1,8 +1,11 @@
-package demo;
+package demo.layout;
+
+import javax.validation.constraints.NotBlank;
 
 public class NameBoundary {
-	
+	@NotBlank
 	private String first;
+	@NotBlank
 	private String last;
 	
 	public NameBoundary() {

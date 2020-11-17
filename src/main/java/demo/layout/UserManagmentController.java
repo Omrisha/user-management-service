@@ -5,7 +5,11 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import demo.errors.BadRequestExeption;
+import demo.logic.UserManagmentService;
+
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 @RestController
 public class UserManagmentController {
@@ -24,8 +28,7 @@ public class UserManagmentController {
     public UserBoundary store(@Valid @RequestBody UserBoundary user, BindingResult result)
     {
 		if (result.hasErrors()) {
-	        System.err.println("Validation Failed");
-	        return null;
+	        throw new BadRequestExeption();
 	    }
 
 		return this.userManagementService.store(user);
@@ -51,9 +54,7 @@ public class UserManagmentController {
 
     @RequestMapping(path = "/users/{email}",
             method = RequestMethod.PUT,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updateUser(@PathVariable("email") String email,
                            @RequestBody UserBoundary user)
     {
@@ -73,9 +74,9 @@ public class UserManagmentController {
     public UserBoundary[] search(
             @RequestParam(name="criteriaType", required = false, defaultValue = "")  String criteriaType,
             @RequestParam(name="criteriaValue", required = false, defaultValue = "")  String value,
-            @RequestParam(name="size", required = false, defaultValue = "10")  String size,
+            @RequestParam(name="size", required = false, defaultValue = "10") String size,
             @RequestParam(name="page", required = false, defaultValue = "0") String page,
-            @RequestParam(name="sortBy", required = false, defaultValue = "name") String sortBy,
+            @RequestParam(name="sortBy", required = false, defaultValue = "email") String sortBy,
             @RequestParam(name="sortOrder", required = false, defaultValue = "ASC") String sortOrder)
     {
         return this.userManagementService.search(criteriaType, value, size, page, sortBy, sortOrder);
