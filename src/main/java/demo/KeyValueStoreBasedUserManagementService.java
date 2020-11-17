@@ -65,13 +65,36 @@ public class KeyValueStoreBasedUserManagementService implements UserManagmentSer
 
 	@Override
 	public UserBoundary login(String email, String password) {
-		// TODO Auto-generated method stub
-		return null;
+		ReflectedUserBoudary kvpUser = this.restTemplate
+				.getForObject(this.url + "/{key}",
+						ReflectedUserBoudary.class,
+						email);
+
+		return kvpUser.getPassword() == password ? kvpUser : new ReflectedUserBoudary();
 	}
 
 	@Override
 	public void updateUser(String email, UserBoundary user) {
+		ReflectedUserBoudary kvpUser = this.restTemplate
+				.getForObject(this.url + "/{key}",
+						ReflectedUserBoudary.class,
+						email);
 
+		if (user.getPassword() != null)
+			kvpUser.setPassword(user.getPassword());
+		if (user.getBirthdate() != null)
+			kvpUser.setBirthdate(user.getBirthdate());
+		if (user.getRoles() != null)
+			kvpUser.setRoles(user.getRoles());
+		if (user.getName() != null) {
+			if (user.getName().getFirst() != null && user.getName().getLast() != null)
+				kvpUser.setName(new NameBoundary(user.getName().getFirst(), user.getName().getLast()));
+		}
+
+		this.restTemplate.put(this.url + "/{key}",
+				kvpUser,
+				KeyValuePairUser.class,
+				email);
 	}
 
 	@Override
