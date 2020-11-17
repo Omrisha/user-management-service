@@ -1,10 +1,18 @@
-package demo;
+package demo.logic;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import demo.errors.NotFoundException;
+import demo.errors.UnauthorizedException;
+import demo.layout.ReflectedUserBoundary;
+import demo.layout.UserBoundary;
+import demo.utils.Formatter;
+import demo.data.KeyValuePairUser;
+import demo.errors.BadRequestExeption;
 
 @Service
 public class KeyValueStoreBasedUserManagementService implements UserManagmentService {
@@ -45,33 +53,68 @@ public class KeyValueStoreBasedUserManagementService implements UserManagmentSer
 	@Override
 	public UserBoundary store(UserBoundary user) {
 		String key = user.getEmail();
-		return this.restTemplate
-			.postForObject(
-				this.url + "/{key}", 
-				user, 
-				KeyValuePairUser.class, 
-				key)
-			.getValueAsUserBoundary();
+		try {
+			return this.restTemplate
+					.postForObject(
+						this.url + "/{key}", 
+						user, 
+						KeyValuePairUser.class, 
+						key)
+					.getValueAsUserBoundary();
+		} catch (Exception e) {
+			throw new BadRequestExeption();
+		}
+		
 	}
 
 	@Override
 	public UserBoundary get(String email) {
-		return this.restTemplate
+		UserBoundary user = this.restTemplate
 				.getForObject(
 					this.url + "/{key}",
-					ReflectedUserBoudary.class,
+					ReflectedUserBoundary.class,
 					email);
+		// Check if user exists
+		if (user == null)
+			throw new NotFoundException("User not found.");
+		
+		return user;
 	}
 
 	@Override
 	public UserBoundary login(String email, String password) {
-		// TODO Auto-generated method stub
-		return null;
+		UserBoundary user = this.restTemplate
+				.getForObject(
+						this.url + "/{key}",
+						UserBoundary.class,
+						email);
+		
+		// Check if user exists
+		if (user == null)
+			throw new UnauthorizedException("Login attempt failed, user not found.");
+		
+		// Compare passwords
+		if (user.comparePassword(password))
+			return new ReflectedUserBoundary(user);
+		
+		throw new UnauthorizedException("Login attempt failed, wrong password.");
 	}
 
 	@Override
 	public void updateUser(String email, UserBoundary user) {
-
+		
+		// Validate email parameter and email in body are the same
+		if (!email.equals(user.getEmail()))
+			throw new BadRequestExeption();
+		
+		// Check if user exists
+		this.get(email);
+		
+		// Update user
+		this.restTemplate
+		.put(this.url + "/{key}",
+				user,
+				email);
 	}
 
 	@Override
@@ -81,7 +124,82 @@ public class KeyValueStoreBasedUserManagementService implements UserManagmentSer
 
 	@Override
 	public UserBoundary[] search(String criteriaType, String value, String size, String page, String sortBy, String sortOrder) {
-		return new UserBoundary[0];
+		
+		// criteriaType provided without value
+		if (!criteriaType.isEmpty() && value.isEmpty())
+			throw new BadRequestExeption();
+		
+		switch (criteriaType) {
+		case "":
+			return this.kVStorageServiceSearch(
+					size,
+					page,
+					sortBy,
+					sortOrder);
+			
+		case "byLastName":
+			return this.kVStorageServiceSearch(
+					"name.last",
+					value,
+					"equals",
+					size,
+					page,
+					sortBy,
+					sortOrder);
+			
+		case "byMinimumAge":
+			try {
+				return this.kVStorageServiceSearch(
+						"birthdate",
+						Formatter.getFormatedCurrentDateMinusYears(Integer.parseInt(value)),
+						"smallerThan",
+						size,
+						page,
+						sortBy,
+						sortOrder);
+			} catch (NumberFormatException e) { // criteriaValue is not an integer
+				throw new BadRequestExeption();
+			}
+			
+			
+		case "byRole":
+			return this.kVStorageServiceSearch(
+					"roles",
+					value,
+					"contains",
+					size,
+					page,
+					sortBy,
+					sortOrder);
+
+		default:
+			throw new NotFoundException("No such criteriaType.");
+		}
+	}
+	
+	private UserBoundary[] kVStorageServiceSearch(
+			String criteriaType,
+			String value,
+			String operator,
+			String size,
+			String page,
+			String sortBy,
+			String sortOrder) {
+		return this.restTemplate.getForObject(
+				this.url + "/search?criteriaType={criteriaType}&criteriaValue={criteriaValue}&criteriaOperator={criteriaOperator}&size={size}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}",
+				ReflectedUserBoundary[].class,
+				criteriaType, value, operator, size, page, sortBy, sortOrder);
+	}
+	
+	private UserBoundary[] kVStorageServiceSearch(
+			String size,
+			String page,
+			String sortBy,
+			String sortOrder) {
+		return this.restTemplate.getForObject(
+				this.url + "/search?size={size}&page={page}&sortBy={sortBy}&sortOrder={sortOrder}",
+				ReflectedUserBoundary[].class,
+				size, page, sortBy, sortOrder);
 	}
 
 }

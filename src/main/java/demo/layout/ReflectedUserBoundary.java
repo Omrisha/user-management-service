@@ -1,8 +1,18 @@
-package demo;
+package demo.layout;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class ReflectedUserBoudary extends UserBoundary {
+public class ReflectedUserBoundary extends UserBoundary {
+	
+	public ReflectedUserBoundary() {}
+
+	public ReflectedUserBoundary(UserBoundary user) {
+		super(user.getEmail(),
+				user.getName(),
+				user.getPassword(),
+				user.getBirthdate(),
+				user.getRoles());
+	}
 
 	@Override
 	@JsonIgnore

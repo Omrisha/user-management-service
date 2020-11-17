@@ -1,4 +1,6 @@
-package demo;
+package demo.logic;
+
+import demo.layout.UserBoundary;
 
 public interface UserManagmentService {
     UserBoundary store(UserBoundary user);

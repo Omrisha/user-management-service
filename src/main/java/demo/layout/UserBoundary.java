@@ -1,20 +1,27 @@
-package demo;
+package demo.layout;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import org.springframework.lang.NonNull;
 
+import demo.validators.NotEmptyElements;
+import demo.validators.ValidPassword;
+
 public class UserBoundary {
-	@NonNull
+	@NotBlank
 	@Email(message = "Email must be valid")
     private String email;
-	@NonNull
+	@Valid
     private NameBoundary name;
 	@ValidPassword
     private String password;
-	@NonNull
+	@Pattern(regexp = "^[0-3]{1}[0-9]{1}-[0-1]{1}[0-2]{1}-[1-9]{1}[0-9]{3}$")
     private String birthdate;
 	@NonNull
+	@NotEmptyElements
     private String[] roles;
 
     public UserBoundary() {}
@@ -65,5 +72,9 @@ public class UserBoundary {
 
     public void setRoles(String[] roles) {
         this.roles = roles;
+    }
+    
+    public boolean comparePassword(String password) {
+    	return this.password.equals(password);
     }
 }

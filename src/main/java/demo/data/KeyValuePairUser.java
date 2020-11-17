@@ -1,8 +1,10 @@
-package demo;
+package demo.data;
 
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import demo.layout.UserBoundary;
 
 public class KeyValuePairUser {
 	private String key;
