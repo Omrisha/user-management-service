@@ -10,7 +10,8 @@ import org.springframework.lang.NonNull;
 import demo.validators.NotEmptyElements;
 import demo.validators.ValidPassword;
 
-public class UserBoundary {
+public class
+UserBoundary {
 	@NotBlank
 	@Email(message = "Email must be valid")
     private String email;
@@ -18,7 +19,7 @@ public class UserBoundary {
     private NameBoundary name;
 	@ValidPassword
     private String password;
-	@Pattern(regexp = "^[0-3]{1}[0-9]{1}-[0-1]{1}[0-2]{1}-[1-9]{1}[0-9]{3}$")
+	@Pattern(regexp = "^[0-3]{1}[0-9]{1}-[0-1]{1}[0-9]{1}-[1-9]{1}[0-9]{3}$")
     private String birthdate;
 	@NonNull
 	@NotEmptyElements
